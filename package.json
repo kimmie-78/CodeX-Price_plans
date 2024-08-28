@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",
-  "scripts": {
-    "test": "mocha",
-    "start": "node index.js"
+"scripts": {
+    "dev": "",
+    "start": "node index.js",
+    "test": "mocha"
   },
   "keywords": [],
   "author": "",
