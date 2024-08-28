@@ -68,10 +68,9 @@
             <input type="number" x-model.number="updatePlan.sms_cost" placeholder="New SMS Cost" />
             <button @click="updatePlanDetails">Update Plan</button>
             <button @click="deletePlan">Delete Plan</button>
-            <h2>Total Amount: R <span x-text="totalAmount"></span></h2>
         </div>
 
-        <!-- Display All Price Plans -->
+        <!-- Display All Price Plans with Total Amount -->
         <div>
             <h3>Price Plans</h3>
             <table>
@@ -80,6 +79,7 @@
                         <th>Name</th>
                         <th>Call Cost</th>
                         <th>SMS Cost</th>
+                        <th>Total Amount</th> <!-- New column for Total Amount -->
                     </tr>
                 </thead>
                 <tbody>
@@ -88,20 +88,26 @@
                             <td x-text="plan.plan_name"></td>
                             <td x-text="plan.call_price"></td>
                             <td x-text="plan.sms_price"></td>
+                            <td x-text="plan.total || 0"></td> <!-- Display total amount -->
                         </tr>
                     </template>
                 </tbody>
             </table>
         </div>
-        <div x-data="{ show: true }" class="img-container">
-            <template x-if="show">
-                <img src="button.jpg" alt="button" class="centered-image">
-            </template>
+
+        <!-- Most and Least Expensive Plans -->
+        <div>
+            <h3>Most and Least Expensive Plans</h3>
+            <div>
+                <h4>Most Expensive Plan:</h4>
+                <p x-text="mostExpensivePlan ? mostExpensivePlan.plan_name + ' - R ' + mostExpensivePlan.total : 'N/A'"></p>
+            </div>
+            <div>
+                <h4>Least Expensive Plan:</h4>
+                <p x-text="leastExpensivePlan ? leastExpensivePlan.plan_name + ' - R ' + leastExpensivePlan.total : 'N/A'"></p>
+            </div>
         </div>
     </div>
-
-
-
 </body>
 
 </html>

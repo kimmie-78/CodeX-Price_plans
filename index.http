@@ -39,3 +39,13 @@ Content-Type: application/json
   "price_plan": "sms_kick_100",
   "actions": "call,sms,call"
 }
+
+### List totals for each price plan
+GET http://localhost:4011/api/price_plans/totals
+Accept: application/json
+
+###
+
+### Find the most and least spent price plans
+GET http://localhost:4011/api/price_plans/most_least_spent
+Accept: application/json

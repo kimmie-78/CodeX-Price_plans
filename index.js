@@ -20,13 +20,13 @@ const dbPromise = sqlite.open({
     // Run migrations
     await db.migrate();
 
+    await db.run('ALTER TABLE price_plan ADD COLUMN total REAL DEFAULT 0');
+
     // Return a list of all the available price plans
     app.get('/api/price_plans', async (req, res) => {
         try {
             const plans = await db.all('SELECT * FROM price_plan');
             res.json(plans);
-            console.log(plans);
-            
         } catch (error) {
             res.status(500).json({ error: 'Failed to retrieve price plans' });
         }
@@ -37,8 +37,8 @@ const dbPromise = sqlite.open({
         const { name, call_cost, sms_cost } = req.body;
         try {
             const result = await db.run(
-                'INSERT INTO price_plan (plan_name, sms_price, call_price) VALUES (?, ?, ?)',
-                [name, sms_cost, call_cost]
+                'INSERT INTO price_plan (plan_name, sms_price, call_price, total) VALUES (?, ?, ?, ?)',
+                [name, sms_cost, call_cost, 0]  // Initialize total to 0
             );
             res.status(201).json({ id: result.lastID });
         } catch (error) {
@@ -95,9 +95,48 @@ const dbPromise = sqlite.open({
                 }
             }, 0);
 
+            // Update total in the database
+            await db.run(
+                'UPDATE price_plan SET total = ? WHERE plan_name = ?',
+                [total, price_plan]
+            );
+
             res.json({ total });
         } catch (error) {
             res.status(500).json({ error: 'Failed to calculate phone bill' });
+        }
+    });
+
+    // List totals for each price plan
+    app.get('/api/price_plans/totals', async (req, res) => {
+        try {
+            const plans = await db.all('SELECT * FROM price_plan');
+            res.json(plans.map(plan => ({
+                plan_name: plan.plan_name,
+                total: plan.total || 0
+            })));
+        } catch (error) {
+            res.status(500).json({ error: 'Failed to retrieve price plan totals' });
+        }
+    });
+
+    // Find the most and least spent price plans
+    app.get('/api/price_plans/most_least_spent', async (req, res) => {
+        try {
+            const plans = await db.all('SELECT * FROM price_plan');
+            if (plans.length === 0) {
+                return res.status(404).json({ error: 'No plans available' });
+            }
+
+            const mostSpent = plans.reduce((prev, curr) => (curr.total > prev.total ? curr : prev));
+            const leastSpent = plans.reduce((prev, curr) => (curr.total < prev.total ? curr : prev));
+
+            res.json({
+                mostSpent: { plan_name: mostSpent.plan_name, total: mostSpent.total || 0 },
+                leastSpent: { plan_name: leastSpent.plan_name, total: leastSpent.total || 0 }
+            });
+        } catch (error) {
+            res.status(500).json({ error: 'Failed to determine most and least spent plans' });
         }
     });
 

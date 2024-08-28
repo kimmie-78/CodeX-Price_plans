@@ -20,11 +20,18 @@ function pricePlanApp() {
         planToUpdateOrDelete: null,
         actions: '',
         totalAmount: 0,
+        mostExpensivePlan: null,
+        leastExpensivePlan: null,
 
         async fetchPricePlans() {
             try {
                 const response = await fetch('/api/price_plans');
                 this.pricePlans = await response.json();
+                this.pricePlans.forEach(plan => {
+                    // Initialize the total field
+                    plan.total = 0;
+                });
+                this.updateMostAndLeastExpensivePlan();
             } catch (error) {
                 console.error('Error fetching price plans:', error);
             }
@@ -38,7 +45,7 @@ function pricePlanApp() {
                     body: JSON.stringify(this.newPlan)
                 });
                 if (response.ok) {
-                    this.fetchPricePlans();
+                    await this.fetchPricePlans();
                     this.newPlan = { name: '', call_cost: 0, sms_cost: 0 };
                 }
             } catch (error) {
@@ -57,7 +64,7 @@ function pricePlanApp() {
                     })
                 });
                 if (response.ok) {
-                    this.fetchPricePlans();
+                    await this.fetchPricePlans();
                     this.updatePlan = { name: '', call_cost: 0, sms_cost: 0 };
                 }
             } catch (error) {
@@ -72,7 +79,7 @@ function pricePlanApp() {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ id: this.planToUpdateOrDelete })
                 });
-                this.fetchPricePlans();
+                await this.fetchPricePlans();
                 this.planToUpdateOrDelete = null;
             } catch (error) {
                 console.error('Error deleting plan:', error);
@@ -104,10 +111,32 @@ function pricePlanApp() {
                     })
                 });
                 const result = await response.json();
-                this.totalAmount = (result.total || 0).toFixed(2); 
+                this.totalAmount = (result.total || 0).toFixed(2);
+
+                // Update the total amount in the selected price plan
+                const plan = this.pricePlans.find(plan => plan.id == this.currentPlan.id);
+                if (plan) {
+                    plan.total = this.totalAmount;
+                    this.updateMostAndLeastExpensivePlan();
+                }
             } catch (error) {
                 console.error('Error calculating total:', error);
             }
+        },
+
+        updateMostAndLeastExpensivePlan() {
+            if (this.pricePlans.length === 0) {
+                this.mostExpensivePlan = null;
+                this.leastExpensivePlan = null;
+                return;
+            }
+
+            this.pricePlans.forEach(plan => {
+                plan.total = parseFloat(plan.total) || 0;
+            });
+
+            this.mostExpensivePlan = this.pricePlans.reduce((max, plan) => plan.total > max.total ? plan : max, this.pricePlans[0]);
+            this.leastExpensivePlan = this.pricePlans.reduce((min, plan) => plan.total < min.total ? plan : min, this.pricePlans[0]);
         },
 
         init() {
