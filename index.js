@@ -20,7 +20,7 @@ const dbPromise = sqlite.open({
     // Run migrations
     await db.migrate();
 
-    await db.run('ALTER TABLE price_plan ADD COLUMN total REAL DEFAULT 0');
+    //await db.run('ALTER TABLE price_plan ADD COLUMN total REAL DEFAULT 0');
 
     // Return a list of all the available price plans
     app.get('/api/price_plans', async (req, res) => {
