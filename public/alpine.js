@@ -28,7 +28,7 @@ function pricePlanApp() {
                 const response = await fetch('/api/price_plans');
                 this.pricePlans = await response.json();
                 this.pricePlans.forEach(plan => {
-                    // Initialize the total field
+                
                     plan.total = 0;
                 });
                 this.updateMostAndLeastExpensivePlan();
@@ -38,20 +38,33 @@ function pricePlanApp() {
         },
 
         async createPlan() {
+            // Check if all fields are filled out
+            if (!this.newPlan.name || !this.newPlan.call_cost || !this.newPlan.sms_cost) {
+                this.errorMessage = 'All fields are required!';
+                alert(this.errorMessage);
+                return;
+            }
+
             try {
-                const response = await fetch('/api/price_plan/create', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(this.newPlan)
-                });
-                if (response.ok) {
-                    await this.fetchPricePlans();
-                    this.newPlan = { name: '', call_cost: 0, sms_cost: 0 };
-                }
+                const response = await axios.post('/api/price_plan/create', this.newPlan);
+                this.pricePlans.push({ ...this.newPlan, id: response.data.id, total: 0 });
+                this.newPlan = { name: '', call_cost: '', sms_cost: '' };
+                this.errorMessage = ''; 
             } catch (error) {
-                console.error('Error creating plan:', error);
+                if (error.response && error.response.data.error) {
+                    this.errorMessage = error.response.data.error;
+                    alert(this.errorMessage); 
+                } else {
+                    console.error('Failed to create price plan');
+                }
             }
         },
+
+        isCreatePlanDisabled() {
+            
+            return !this.newPlan.name || !this.newPlan.call_cost || !this.newPlan.sms_cost;
+        },
+
 
         async updatePlanDetails() {
             try {

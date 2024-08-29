@@ -70,8 +70,6 @@
     <button :disabled="isUpdateOrDeleteDisabled()" @click="deletePlan">Delete Plan</button>
 </div>
 
-<!-- Calculate Total Button -->
-<button :disabled="isCalculateDisabled()" @click="calculateTotal()">Calculate Total</button>
 
 
         <!-- Display All Price Plans with Total Amount -->
@@ -83,7 +81,7 @@
                         <th>Name</th>
                         <th>Call Cost</th>
                         <th>SMS Cost</th>
-                        <th>Total Amount</th> <!-- New column for Total Amount -->
+                        <th>Total Amount</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -92,7 +90,7 @@
                             <td x-text="plan.plan_name"></td>
                             <td x-text="plan.call_price"></td>
                             <td x-text="plan.sms_price"></td>
-                            <td x-text="plan.total || 0"></td> <!-- Display total amount -->
+                            <td x-text="plan.total || 0"></td> 
                         </tr>
                     </template>
                 </tbody>
