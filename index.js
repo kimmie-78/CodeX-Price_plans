@@ -36,6 +36,12 @@ const dbPromise = sqlite.open({
     app.post('/api/price_plan/create', async (req, res) => {
         const { name, call_cost, sms_cost } = req.body;
         try {
+            // Check if the plan name already exists
+            const existingPlan = await db.get('SELECT * FROM price_plan WHERE plan_name = ?', [name]);
+            if (existingPlan) {
+                return res.status(400).json({ error: 'Price plan already exists' });
+            }
+    
             const result = await db.run(
                 'INSERT INTO price_plan (plan_name, sms_price, call_price, total) VALUES (?, ?, ?, ?)',
                 [name, sms_cost, call_cost, 0]  // Initialize total to 0
@@ -45,11 +51,16 @@ const dbPromise = sqlite.open({
             res.status(500).json({ error: 'Failed to create price plan' });
         }
     });
-
-    // Update a price plan
+    
     app.post('/api/price_plan/update', async (req, res) => {
         const { id, name, call_cost, sms_cost } = req.body;
         try {
+            // Check for duplication by name, excluding the current plan's ID
+            const existingPlan = await db.get('SELECT * FROM price_plan WHERE plan_name = ? AND id != ?', [name, id]);
+            if (existingPlan) {
+                return res.status(400).json({ error: 'Another price plan with the same name already exists' });
+            }
+    
             await db.run(
                 'UPDATE price_plan SET plan_name = ?, sms_price = ?, call_price = ? WHERE id = ?',
                 [name, sms_cost, call_cost, id]
@@ -59,7 +70,7 @@ const dbPromise = sqlite.open({
             res.status(500).json({ error: 'Failed to update price plan' });
         }
     });
-
+    
     // Delete a price plan
     app.post('/api/price_plan/delete', async (req, res) => {
         const { id } = req.body;

@@ -45,30 +45,34 @@
             </div>
         </div>
 
-        <!-- Create New Price Plan -->
-        <div>
-            <h3>Create New Price Plan</h3>
-            <input type="text" x-model="newPlan.name" placeholder="Plan Name" />
-            <input type="number" x-model.number="newPlan.call_cost" placeholder="Call Cost" />
-            <input type="number" x-model.number="newPlan.sms_cost" placeholder="SMS Cost" />
-            <button @click="createPlan">Create Plan</button>
-        </div>
+       <!-- Create New Price Plan -->
+<div>
+    <h3>Create New Price Plan</h3>
+    <input type="text" x-model="newPlan.name" placeholder="Plan Name" />
+    <input type="number" x-model.number="newPlan.call_cost" placeholder="Call Cost" />
+    <input type="number" x-model.number="newPlan.sms_cost" placeholder="SMS Cost" />
+    <button :disabled="isCreatePlanDisabled()" @click="createPlan">Create Plan</button>
+</div>
 
-        <!-- Update and Delete Price Plans -->
-        <div>
-            <h3>Update or Delete Price Plan</h3>
-            <select x-model="planToUpdateOrDelete">
-                <option value="">--Select a Plan--</option>
-                <template x-for="plan in pricePlans" :key="plan.id">
-                    <option :value="plan.id" x-text="plan.plan_name"></option>
-                </template>
-            </select>
-            <input type="text" x-model="updatePlan.name" placeholder="New Plan Name" />
-            <input type="number" x-model.number="updatePlan.call_cost" placeholder="New Call Cost" />
-            <input type="number" x-model.number="updatePlan.sms_cost" placeholder="New SMS Cost" />
-            <button @click="updatePlanDetails">Update Plan</button>
-            <button @click="deletePlan">Delete Plan</button>
-        </div>
+<!-- Update and Delete Price Plans -->
+<div>
+    <h3>Update or Delete Price Plan</h3>
+    <select x-model="planToUpdateOrDelete">
+        <option value="">--Select a Plan--</option>
+        <template x-for="plan in pricePlans" :key="plan.id">
+            <option :value="plan.id" x-text="plan.plan_name"></option>
+        </template>
+    </select>
+    <input type="text" x-model="updatePlan.name" placeholder="New Plan Name" />
+    <input type="number" x-model.number="updatePlan.call_cost" placeholder="New Call Cost" />
+    <input type="number" x-model.number="updatePlan.sms_cost" placeholder="New SMS Cost" />
+    <button :disabled="isUpdateOrDeleteDisabled()" @click="updatePlanDetails">Update Plan</button>
+    <button :disabled="isUpdateOrDeleteDisabled()" @click="deletePlan">Delete Plan</button>
+</div>
+
+<!-- Calculate Total Button -->
+<button :disabled="isCalculateDisabled()" @click="calculateTotal()">Calculate Total</button>
+
 
         <!-- Display All Price Plans with Total Amount -->
         <div>
