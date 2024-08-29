@@ -94,7 +94,7 @@
                 </tbody>
             </table>
         </div>
-
+        
         <!-- Most and Least Expensive Plans -->
         <div>
             <h3>Most and Least Expensive Plans</h3>
@@ -107,12 +107,13 @@
                 <p x-text="leastExpensivePlan ? leastExpensivePlan.plan_name + ' - R ' + leastExpensivePlan.total : 'N/A'"></p>
             </div>
         </div>
+        <div x-data="{ show: true }" class="img-container">
+            <template x-if="show">
+                <img src="button.jpg" alt="button" class="centered-image">
+            </template>
+        </div>
     </div>
-    <div x-data="{ show: true }" class="img-container">
-        <template x-if="show">
-            <img src="button.jpg" alt="button" class="centered-image">
-        </template>
-    </div>
+
 </body>
 
 </html>
